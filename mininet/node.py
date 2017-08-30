@@ -291,13 +291,13 @@ class Node(object):
                     n = 1
                 node.params['wlan'].append(node.name + '-wlan' + str(n + 1))
                 if 'link' in params and params['link'] == 'mesh':
-                    node.params['rssi'].append(0)
-                    node.params['snr'].append(0)
+                    node.params['rssi'].append(-60)
+                    node.params['snr'].append(40)
                     node.params['associatedTo'].append('')
             else:
                 node.params['wlan'].append(node.name + '-wlan' + str(n))
-                node.params['rssi'].append(0)
-                node.params['snr'].append(0)
+                node.params['rssi'].append(-60)
+                node.params['snr'].append(40)
             node.params.pop("wlans", None)
                         
         if (mode == 'managed'):
@@ -545,7 +545,7 @@ class Node(object):
                     plot2d.graphPause()
         except:
             pass
-        mobility.parameters_(self)
+        mobility.parameters_()
 
     def moveNodeTo(self, pos):
         pos = pos.split(',')
@@ -558,7 +558,7 @@ class Node(object):
         mobility.parameters_(self)
 
     def setAntennaGain(self, iface, value):
-        wlan = int(iface[-1:])
+        wlan = self.params['wlan'].index(iface)
         self.params['antennaGain'][wlan] = int(value)
         if mobility.DRAW:
             try:
@@ -568,7 +568,7 @@ class Node(object):
         mobility.parameters_(self)
 
     def setTxPower(self, iface, txpower):
-        wlan = int(iface[-1:])
+        wlan = self.params['wlan'].index(iface)
         self.pexec('iwconfig %s txpower %s' % (iface, txpower))
         self.params['txpower'][wlan] = txpower
         mobility.parameters_(self)
@@ -991,7 +991,7 @@ class Node(object):
            prefixLen: prefix length, e.g. 8 for /8 or 16M addrs
            kwargs: any additional arguments for intf.setIP"""
         if intf != None and (self.type == 'station' or self.type == 'vehicle'):
-            wlan = int(intf[-1:])
+            wlan = self.params['wlan'].index(intf)
             self.params['ip'][wlan] = ip
         
         return self.intf(intf).setIP(ip, prefixLen, **kwargs)
